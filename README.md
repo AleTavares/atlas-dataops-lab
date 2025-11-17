@@ -36,27 +36,35 @@ atlas-dataops-lab/
 ├── Dockerfile_Spark           # PySpark + Jupyter
 ├── wait-for-atlas.sh          # Script de inicialização
 ├── users-credentials.properties # Autenticação Atlas
-│
-├── Dados
-│   ├── db/
-│   │   └── northwind.sql          # Schema e dados PostgreSQL
-│   └── data/                      # Datasets para análise
-│
-├── ├── lab/
-│   │   ├── atlas_client.py        # Cliente Python para Atlas API
-│   │   ├── requirements.txt       # Dependências Python
-│   │   └── run_lab.sh            # Script de execução
-│   │
-│   └── notebooks/
-│       ├── Lab_Catalogo_Postgres_no_Atlas_Documented_Fixed.ipynb
-│       └── data/                  # Dados para notebooks
-│
-├── Exercícios
-│   ├── EXERCICIO_ATLAS.md         # Exercício prático completo
-│
-├── README.md                  # Este arquivo
 ├── LICENSE                    # Licença do projeto
-└── .gitignore                # Arquivos ignorados
+├── README.md                  # Este arquivo
+├── .gitignore                # Arquivos ignorados
+│
+├── data/                      # Datasets para análise
+├── db/
+│   └── northwind.sql          # Schema e dados PostgreSQL
+│
+├── Exercicios/
+│   └── EXERCICIO_ATLAS.md     # Exercício prático completo
+│
+├── lab/
+│   ├── atlas_client.py        # Cliente Python para Atlas API
+│   ├── config.py              # Configurações do laboratório
+│   ├── data_discovery.py      # Descoberta de dados
+│   ├── lineage_demo.py        # Demonstração de linhagem
+│   ├── postgres_integration.py # Integração PostgreSQL
+│   ├── LAB_ATLAS_PYTHON.md    # Guia do laboratório Python
+│   ├── requirements.txt       # Dependências Python
+│   └── run_lab.sh            # Script de execução
+│
+├── notebooks/
+│   ├── Lab_Catalogo_Postgres_no_Atlas.ipynb
+│   └── data/                  # Dados para notebooks
+│
+└── respostas/
+    ├── config_exercicio.py    # Configurações do exercício
+    ├── requirements_exercicio.txt # Dependências do exercício
+    └── SOLUCAO_EXERCICIO.py   # Solução completa
 ```
 
 ## Início Rápido
@@ -286,7 +294,7 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para de
 - **Docker Community** - Pela containerização simplificada
 - **Jupyter Project** - Pelo ambiente interativo de análise
 
-**Para começar, acesse os laboratórios em ordem:**
+**📚 Para começar, acesse os laboratórios em ordem:**
 1. [Lab Python Básico](lab/LAB_ATLAS_PYTHON.md)
 2. [Exercício Prático](Exercicios/EXERCICIO_ATLAS.md)
 3. [Notebook Interativo](notebooks/Lab_Catalogo_Postgres_no_Atlas.ipynb)
