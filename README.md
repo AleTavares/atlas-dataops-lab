@@ -27,7 +27,7 @@ Este repositório fornece um ambiente completo de aprendizado para **Data Govern
 | **Search** | Apache Solr (embedded) | - | - | Indexação e busca |
 | **Messaging** | Apache Kafka (embedded) | - | - | Eventos e notificações |
 
-## 📁 Estrutura do Repositório
+## Estrutura do Repositório
 
 ```
 atlas-dataops-lab/
@@ -37,7 +37,7 @@ atlas-dataops-lab/
 ├── wait-for-atlas.sh          # Script de inicialização
 ├── users-credentials.properties # Autenticação Atlas
 │
-├── 🗄️ Dados
+├── Dados
 │   ├── db/
 │   │   └── northwind.sql          # Schema e dados PostgreSQL
 │   └── data/                      # Datasets para análise
@@ -59,7 +59,7 @@ atlas-dataops-lab/
 └── .gitignore                # Arquivos ignorados
 ```
 
-## 🚀 Início Rápido
+## Início Rápido
 
 ### 1. Pré-requisitos
 
@@ -93,7 +93,7 @@ docker-compose ps
 | **Jupyter Notebook** | http://localhost:8888 | Token: tavares1234 |
 | **PostgreSQL** | localhost:2001 | postgres / postgres |
 
-## 🧪 Laboratórios Disponíveis
+## Laboratórios Disponíveis
 
 ### Lab 1: Cliente Atlas Básico
 ```bash
@@ -115,7 +115,7 @@ python atlas_client.py
 ```
 **Aprenda**: Implementação completa de catalogador de dados
 
-## 🔧 Configurações Detalhadas
+## Configurações Detalhadas
 
 ### Apache Atlas
 - **Modo**: Standalone com componentes embedded
@@ -142,7 +142,7 @@ python atlas_client.py
 - **Volumes**: notebooks/ e data/ mapeados
 - **Spark UI**: http://localhost:4040 (quando jobs estão rodando)
 
-## 📋 Comandos Úteis
+## Comandos Úteis
 
 ### Gerenciamento de Serviços
 ```bash
@@ -176,7 +176,7 @@ docker exec -it postgres-erp psql -U postgres -d northwind -c "SELECT count(*) F
 docker stats
 ```
 
-## 🎓 Casos de Uso Educacionais
+## Casos de Uso Educacionais
 
 ### 1. **Data Discovery**
 - Descoberta automática de esquemas de banco
@@ -203,7 +203,7 @@ docker stats
 - Integração com pipelines CI/CD
 - Monitoramento de qualidade de dados
 
-## 🔍 Troubleshooting
+## Troubleshooting
 
 ### Problemas Comuns
 
@@ -249,7 +249,7 @@ docker stats --no-stream
 docker system df
 ```
 
-## 🤝 Contribuição
+## Contribuição
 
 Este é um projeto educacional. Contribuições são bem-vindas:
 
@@ -266,20 +266,18 @@ Este é um projeto educacional. Contribuições são bem-vindas:
 - Testes automatizados
 - Documentação adicional
 
-## 📄 Licença
+## Licença
 
 Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para detalhes.
 
-## 🙏 Agradecimentos
+## Agradecimentos
 
 - **Apache Atlas Community** - Pela excelente ferramenta de governança
 - **Northwind Database** - Pelo dataset educacional clássico
 - **Docker Community** - Pela containerização simplificada
 - **Jupyter Project** - Pelo ambiente interativo de análise
 
----
-
-**📚 Para começar, acesse os laboratórios em ordem:**
+**Para começar, acesse os laboratórios em ordem:**
 1. [Lab Python Básico](LAB_ATLAS_PYTHON.md)
 2. [Exercício Prático](EXERCICIO_ATLAS.md)
 3. [Notebook Interativo](notebooks/Lab_Catalogo_Postgres_no_Atlas_Documented_Fixed.ipynb)
