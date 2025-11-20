@@ -51,6 +51,8 @@ services:
     volumes:
       - ./notebooks:/home/jovyan/work
       - ./data:/home/jovyan/data
+      - ./spark_jobs:/home/jovyan/work/spark_jobs
+      - iceberg_warehouse:/home/jovyan/iceberg-warehouse
 
     # Variáveis de ambiente
     environment:
@@ -83,7 +85,13 @@ services:
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
       - ./data:/opt/airflow/data:rw
-    command: airflow standalone
+      - ./spark_jobs:/opt/airflow/spark_jobs
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: >
+      bash -c "
+      /opt/airflow/init_connections.sh &&
+      airflow standalone
+      "
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
       interval: 30s
@@ -97,6 +105,7 @@ volumes:
   postgres_data:
   atlas_data:
   atlas_logs:
+  iceberg_warehouse:
 
 networks:
   plataform-network:

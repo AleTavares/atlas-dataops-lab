@@ -22,8 +22,9 @@ Este repositório fornece um ambiente completo de aprendizado para **Data Govern
 |------------|------------|--------|-------|--------|
 | **Catálogo** | Apache Atlas | 2.3.0 | 21000 | Governança e metadados |
 | **Database** | PostgreSQL | 14.19 | 2001 | Dados de exemplo (Northwind) |
-| **Orquestração** | Apache Airflow | 2.8.1 | 5000 | Workflows e ETL |
+| **Orquestração** | Apache Airflow | 3.0.0 | 5000 | Workflows e ETL |
 | **Analytics** | PySpark + Jupyter | Latest | 8888 | Análise e notebooks |
+| **Data Lake** | Apache Iceberg | 1.4.3 | - | Armazenamento com versionamento |
 | **Storage** | HBase (embedded) | - | - | Persistência Atlas |
 | **Search** | Apache Solr (embedded) | - | - | Indexação e busca |
 | **Messaging** | Apache Kafka (embedded) | - | - | Eventos e notificações |
@@ -34,11 +35,13 @@ Este repositório fornece um ambiente completo de aprendizado para **Data Govern
 atlas-dataops-lab/
 ├── docker-compose.yml          # Orquestração dos serviços
 ├── Dockerfile                  # Atlas customizado
-├── Dockerfile_Spark           # PySpark + Jupyter
+├── Dockerfile_Spark           # PySpark + Jupyter + Iceberg
 ├── Dockerfile_AirFlow         # Apache Airflow
 ├── wait-for-atlas.sh          # Script de inicialização
 ├── users-credentials.properties # Autenticação Atlas
 ├── requirements.txt           # Dependências globais
+├── airflow_connections.py     # Configuração de conexões
+├── spark_remote_submit.py     # Wrapper Spark remoto
 ├── .env                       # Variáveis de ambiente
 ├── LICENSE                    # Licença do projeto
 ├── README.md                  # Este arquivo
@@ -46,8 +49,13 @@ atlas-dataops-lab/
 │
 ├── dags/                      # DAGs do Airflow
 │   ├── __init__.py
-│   ├── catalog_postgres_to_atlas.py # DAG de catalogação
-│   └── cleanup_atlas.py       # DAG de limpeza do Atlas
+│   ├── catalog_postgres_to_atlas.py # DAG de catalogação PostgreSQL
+│   ├── cleanup_atlas.py       # DAG de limpeza do Atlas
+│   ├── etl_northwind_to_iceberg.py # DAG ETL Spark + Iceberg
+│   └── setup_spark_connection.py # DAG setup conexão Spark
+│
+├── spark_jobs/                # Jobs Spark
+│   └── northwind_to_iceberg.py # ETL Northwind -> Iceberg
 │
 ├── logs/                      # Logs do Airflow
 │   ├── dag_processor/         # Logs de processamento
@@ -75,6 +83,7 @@ atlas-dataops-lab/
 │
 ├── notebooks/
 │   ├── Lab_Catalogo_Postgres_no_Atlas.ipynb
+│   ├── Iceberg_Demo.ipynb     # Demo Apache Iceberg
 │   └── data/                  # Dados para notebooks
 │
 └── respostas/
@@ -149,7 +158,21 @@ python atlas_client.py
 ```
 **Aprenda**: Manutenção e limpeza de metadados
 
-### Lab 4: Exercício Prático Completo
+### Lab 4: Spark + Iceberg - ETL Completo
+```bash
+# Acessar: http://localhost:5000 (admin/admin)
+# Executar DAG: etl_northwind_to_iceberg
+```
+**Aprenda**: ETL com Spark, Iceberg, linhagem e tags de qualidade
+
+### Lab 5: Iceberg Demo Interativo
+```bash
+# Acessar: http://localhost:8888 (token: tavares1234)
+# Abrir: Iceberg_Demo.ipynb
+```
+**Aprenda**: Apache Iceberg, time travel, versionamento
+
+### Lab 6: Exercício Prático Completo
 ```bash
 # Seguir instruções em EXERCICIO_ATLAS.md
 ```
@@ -204,6 +227,22 @@ python atlas_client.py
   - `delete_databases` - Remove todos os databases
   - `cleanup_remaining` - Limpa entidades restantes
 - **⚠️ ATENÇÃO**: Remove TODAS as entidades do Atlas
+
+### 3. **etl_northwind_to_iceberg**
+- **Descrição**: ETL completo Northwind PostgreSQL para Iceberg Raw Layer
+- **Schedule**: Semanal (`@weekly`)
+- **Tasks**:
+  - `check_spark_job` - Verifica existência do job Spark
+  - `submit_spark_job` - Executa job Spark no container pyspark-aula
+  - `validate_results` - Valida tabelas criadas via Atlas API
+- **Funcionalidades**: Extração, catalogação, linhagem, tags de qualidade
+
+### 4. **setup_spark_connection**
+- **Descrição**: Configuração da conexão Spark no Airflow
+- **Schedule**: Manual apenas
+- **Tasks**:
+  - `create_spark_connection` - Cria conexão spark_container
+- **Uso**: Executar uma vez para configurar ambiente
 
 ## Comandos Úteis
 
@@ -314,12 +353,15 @@ Os próximos desenvolvimentos deste repositório incluirão a implementação de
 |------------|----------------|--------|
 | **Airflow** | DAGs de catalogação automática | ✅ **Implementado** |
 | **Airflow** | DAG de limpeza do Atlas | ✅ **Implementado** |
+| **Airflow** | DAG ETL Spark + Iceberg | ✅ **Implementado** |
 | **Atlas** | Catalogação via API REST | ✅ **Implementado** |
-| **Atlas** | Limpeza completa de entidades | ✅ **Implementado** |
+| **Atlas** | Linhagem automática de dados | ✅ **Implementado** |
+| **Atlas** | Tags de qualidade automatizadas | ✅ **Implementado** |
 | **PostgreSQL** | Extração de metadados Northwind | ✅ **Implementado** |
-| **Spark** | Jobs ETL com linhagem | 🔄 Em desenvolvimento |
+| **Spark** | Jobs ETL com Iceberg | ✅ **Implementado** |
+| **Iceberg** | Armazenamento com versionamento | ✅ **Implementado** |
 | **Monitoring** | Dashboard de qualidade de dados | 📋 Planejado |
-| **Governance** | Políticas automatizadas | 📋 Planejado |
+| **Governance** | Políticas avançadas | 📋 Planejado |
 
 ### **Benefícios da Evolução**
 
