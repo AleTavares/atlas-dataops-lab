@@ -52,7 +52,7 @@ services:
       - ./notebooks:/home/jovyan/work
       - ./data:/home/jovyan/data
       - ./spark_jobs:/home/jovyan/work/spark_jobs
-      - iceberg_warehouse:/home/jovyan/iceberg-warehouse
+      - ./iceberg_warehouse:/home/jovyan/iceberg-warehouse
 
     # Variáveis de ambiente
     environment:
