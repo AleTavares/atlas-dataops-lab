@@ -64,6 +64,34 @@ services:
     restart: always
     networks:
       - plataform-network
+  airflow-standalone:
+    build:
+      context: .
+      dockerfile: Dockerfile_AirFlow
+    # build: .
+    # image: airflow3-custom:latest
+    user: root
+    ports:
+      - "5000:8080"
+    environment:
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'False'
+      AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY}
+      AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW_SECRET_KEY}
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://postgres:postgres@postgres_erp:5432/northwind
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+      - ./data:/opt/airflow/data:rw
+    command: airflow standalone
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - plataform-network
 
 volumes:
   postgres_data:

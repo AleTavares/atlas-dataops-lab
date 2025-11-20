@@ -22,23 +22,39 @@ Este repositório fornece um ambiente completo de aprendizado para **Data Govern
 |------------|------------|--------|-------|--------|
 | **Catálogo** | Apache Atlas | 2.3.0 | 21000 | Governança e metadados |
 | **Database** | PostgreSQL | 14.19 | 2001 | Dados de exemplo (Northwind) |
+| **Orquestração** | Apache Airflow | 2.8.1 | 5000 | Workflows e ETL |
 | **Analytics** | PySpark + Jupyter | Latest | 8888 | Análise e notebooks |
 | **Storage** | HBase (embedded) | - | - | Persistência Atlas |
 | **Search** | Apache Solr (embedded) | - | - | Indexação e busca |
 | **Messaging** | Apache Kafka (embedded) | - | - | Eventos e notificações |
 
-## Estrutura do Repositório
+## 📁 Estrutura do Repositório
 
 ```
 atlas-dataops-lab/
 ├── docker-compose.yml          # Orquestração dos serviços
 ├── Dockerfile                  # Atlas customizado
 ├── Dockerfile_Spark           # PySpark + Jupyter
+├── Dockerfile_AirFlow         # Apache Airflow
 ├── wait-for-atlas.sh          # Script de inicialização
 ├── users-credentials.properties # Autenticação Atlas
+├── requirements.txt           # Dependências globais
+├── .env                       # Variáveis de ambiente
 ├── LICENSE                    # Licença do projeto
 ├── README.md                  # Este arquivo
 ├── .gitignore                # Arquivos ignorados
+│
+├── dags/                      # DAGs do Airflow
+│   ├── __init__.py
+│   ├── catalog_postgres_to_atlas.py # DAG de catalogação
+│   └── cleanup_atlas.py       # DAG de limpeza do Atlas
+│
+├── logs/                      # Logs do Airflow
+│   ├── dag_processor/         # Logs de processamento
+│   └── .gitkeep              # Mantém diretório no Git
+│
+├── plugins/                   # Plugins customizados do Airflow
+│   └── __init__.py
 │
 ├── data/                      # Datasets para análise
 ├── db/
@@ -80,7 +96,7 @@ atlas-dataops-lab/
 
 ```bash
 # Clonar o repositório
-git clone <URL_DO_REPOSITORIO>
+git clone https://github.com/AleTavares/atlas-dataops-lab.git
 cd atlas-dataops-lab
 
 # Iniciar todos os serviços
@@ -98,6 +114,7 @@ docker-compose ps
 | Serviço | URL | Credenciais |
 |---------|-----|-------------|
 | **Apache Atlas** | http://localhost:21000 | admin / admin |
+| **Apache Airflow** | http://localhost:5000 | admin / admin |
 | **Jupyter Notebook** | http://localhost:8888 | Token: tavares1234 |
 | **PostgreSQL** | localhost:2001 | postgres / postgres |
 
@@ -118,7 +135,21 @@ python atlas_client.py
 ```
 **Aprenda**: Extração de metadados, catalogação automática, visualização
 
-### Lab 3: Exercício Prático Completo
+### Lab 3: Airflow - Catalogação Automática
+```bash
+# Acessar: http://localhost:5000 (admin/admin)
+# Executar DAG: catalog_postgres_to_atlas
+```
+**Aprenda**: Orquestração de workflows de catalogação
+
+### Lab 3.1: Airflow - Limpeza do Atlas
+```bash
+# Acessar: http://localhost:5000 (admin/admin)
+# Executar DAG: cleanup_atlas (execução manual)
+```
+**Aprenda**: Manutenção e limpeza de metadados
+
+### Lab 4: Exercício Prático Completo
 ```bash
 # Seguir instruções em EXERCICIO_ATLAS.md
 ```
@@ -151,6 +182,29 @@ python atlas_client.py
 - **Volumes**: notebooks/ e data/ mapeados
 - **Spark UI**: http://localhost:4040 (quando jobs estão rodando)
 
+## 📋 DAGs Disponíveis
+
+### 1. **catalog_postgres_to_atlas**
+- **Descrição**: Catalogação automática do PostgreSQL Northwind no Atlas
+- **Schedule**: Diário (`@daily`)
+- **Tasks**: 
+  - `extract_metadata` - Extrai metadados do PostgreSQL
+  - `create_database` - Cria database no Atlas
+  - `catalog_tables` - Cataloga estrutura das tabelas
+  - `catalog_columns` - Cataloga colunas das tabelas
+- **Execução**: Automática ou manual
+
+### 2. **cleanup_atlas**
+- **Descrição**: Limpeza completa de todas as entidades do Atlas
+- **Schedule**: Manual apenas
+- **Tasks**:
+  - `get_all_entities` - Lista todas as entidades
+  - `delete_columns` - Remove todas as colunas
+  - `delete_tables` - Remove todas as tabelas
+  - `delete_databases` - Remove todos os databases
+  - `cleanup_remaining` - Limpa entidades restantes
+- **⚠️ ATENÇÃO**: Remove TODAS as entidades do Atlas
+
 ## Comandos Úteis
 
 ### Gerenciamento de Serviços
@@ -158,7 +212,7 @@ python atlas_client.py
 # Ver logs específicos
 docker-compose logs -f atlas
 docker-compose logs -f postgres_erp
-docker-compose logs -f pyspark-aula
+docker-compose logs -f airflow-standalone
 
 # Reiniciar serviço específico
 docker-compose restart atlas
@@ -171,6 +225,22 @@ docker-compose down -v
 
 # Rebuild completo
 docker-compose up --build --force-recreate
+```
+
+### Airflow - Gerenciamento de DAGs
+```bash
+# Listar DAGs
+docker exec -it airflow-standalone airflow dags list
+
+# Executar DAG manualmente
+docker exec -it airflow-standalone airflow dags trigger catalog_postgres_to_atlas
+
+# Ver status de execução
+docker exec -it airflow-standalone airflow dags state catalog_postgres_to_atlas
+
+# Pausar/Despausar DAG
+docker exec -it airflow-standalone airflow dags pause catalog_postgres_to_atlas
+docker exec -it airflow-standalone airflow dags unpause catalog_postgres_to_atlas
 ```
 
 ### Diagnóstico
@@ -238,15 +308,18 @@ Os próximos desenvolvimentos deste repositório incluirão a implementação de
 
 ### **Arquitetura Futura**
 
-### **Funcionalidades Planejadas**
+### **Funcionalidades Implementadas e Planejadas**
 
 | Componente | Funcionalidade | Status |
 |------------|----------------|--------|
-| **Airflow** | DAGs de catalogação automática | Em desenvolvimento |
-| **Spark** | Jobs ETL com linhagem | Em desenvolvimento |
-| **Atlas** | Linhagem automática de processos | Em desenvolvimento |
-| **Monitoring** | Dashboard de qualidade de dados | Planejado |
-| **Governance** | Políticas automatizadas | Planejado |
+| **Airflow** | DAGs de catalogação automática | ✅ **Implementado** |
+| **Airflow** | DAG de limpeza do Atlas | ✅ **Implementado** |
+| **Atlas** | Catalogação via API REST | ✅ **Implementado** |
+| **Atlas** | Limpeza completa de entidades | ✅ **Implementado** |
+| **PostgreSQL** | Extração de metadados Northwind | ✅ **Implementado** |
+| **Spark** | Jobs ETL com linhagem | 🔄 Em desenvolvimento |
+| **Monitoring** | Dashboard de qualidade de dados | 📋 Planejado |
+| **Governance** | Políticas automatizadas | 📋 Planejado |
 
 ### **Benefícios da Evolução**
 
