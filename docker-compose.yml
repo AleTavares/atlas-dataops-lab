@@ -41,6 +41,7 @@ services:
       dockerfile: Dockerfile_Spark
     
     container_name: pyspark_aula_container
+    user: root
     
     # Mapeia as portas
     ports:

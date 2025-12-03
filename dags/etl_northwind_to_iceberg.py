@@ -90,7 +90,7 @@ check_job_task = PythonOperator(
 submit_job_task = BashOperator(
     task_id='submit_spark_job',
     bash_command="""
-    docker exec pyspark_aula_container spark-submit \
+    docker exec -e JUPYTER_TOKEN=tavares1234 pyspark_aula_container spark-submit \
         --master local[*] \
         --conf spark.sql.extensions=org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions \
         --conf spark.sql.catalog.iceberg=org.apache.iceberg.spark.SparkCatalog \

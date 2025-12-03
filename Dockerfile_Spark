@@ -35,7 +35,7 @@ RUN mkdir -p /usr/local/spark/conf && \
 # Create Iceberg warehouse directory and fix permissions
 RUN mkdir -p /home/jovyan/iceberg-warehouse /home/jovyan/work /home/jovyan/data && \
     chown -R jovyan:users /home/jovyan && \
-    chmod -R 755 /home/jovyan
+    chmod -R 777 /home/jovyan
 
 USER jovyan
 
