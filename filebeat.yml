@@ -1,0 +1,60 @@
+filebeat.inputs:
+  # Logs do Airflow
+  - type: log
+    enabled: true
+    paths:
+      - /var/log/airflow/dag_processor/**/*.log
+      - /var/log/airflow/dag_id=*/**/*.log
+    fields:
+      service: airflow
+      log_type: dag_execution
+    fields_under_root: true
+    multiline.pattern: '^\['
+    multiline.negate: true
+    multiline.match: after
+
+  # Logs de containers Docker
+  - type: container
+    enabled: true
+    paths:
+      - '/var/lib/docker/containers/*/*.log'
+    processors:
+      - add_docker_metadata:
+          host: "unix:///var/run/docker.sock"
+
+# Processadores
+processors:
+  - add_host_metadata:
+      when.not.contains.tags: forwarded
+  - add_cloud_metadata: ~
+  - add_docker_metadata: ~
+  - add_kubernetes_metadata: ~
+
+# Output para Elasticsearch
+output.elasticsearch:
+  hosts: ["elasticsearch:9200"]
+  indices:
+    - index: "airflow-logs-%{+yyyy.MM.dd}"
+      when.equals:
+        service: "airflow"
+    - index: "docker-logs-%{+yyyy.MM.dd}"
+      when.not.equals:
+        service: "airflow"
+
+# Configurações gerais
+setup.template.name: "dataops-logs"
+setup.template.pattern: "dataops-logs-*"
+setup.ilm.enabled: false
+
+# Kibana dashboard setup
+setup.kibana:
+  host: "kibana:5601"
+
+# Logging
+logging.level: info
+logging.to_files: true
+logging.files:
+  path: /var/log/filebeat
+  name: filebeat
+  keepfiles: 7
+  permissions: 0644

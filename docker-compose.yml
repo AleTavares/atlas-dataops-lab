@@ -5,13 +5,19 @@ services:
     ports:
       - "21000:21000"
     environment:
-      - JAVA_OPTS=-Xmx1024m -Xms512m
+      - JAVA_OPTS=-Xmx1536m -Xms768m
       - ATLAS_SERVER_OPTS=-server -XX:SoftRefLRUPolicyMSPerMB=0 -XX:+CMSClassUnloadingEnabled -XX:+UseConcMarkSweepGC -XX:+CMSPermGenSweepingEnabled
     volumes:
       - atlas_data:/opt/atlas/data
       - atlas_logs:/opt/atlas/logs
     restart: unless-stopped
-    mem_limit: 2g
+    mem_limit: 3g
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:21000 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 180s
     ulimits:
       nofile:
         soft: 65536
@@ -81,6 +87,10 @@ services:
       AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY}
       AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW_SECRET_KEY}
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://postgres:postgres@postgres_erp:5432/northwind
+      AIRFLOW__WEBSERVER__AUTHENTICATE: 'True'
+      AIRFLOW__WEBSERVER__AUTH_BACKEND: 'airflow.api.auth.backend.basic_auth'
+      _AIRFLOW_WWW_USER_USERNAME: admin
+      _AIRFLOW_WWW_USER_PASSWORD: admin
     volumes:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
@@ -102,11 +112,71 @@ services:
     networks:
       - plataform-network
 
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - plataform-network
+    restart: unless-stopped
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.0
+    container_name: kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    networks:
+      - plataform-network
+    restart: unless-stopped
+
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:8.11.0
+    container_name: filebeat
+    user: root
+    volumes:
+      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - ./logs:/var/log/airflow:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command: filebeat -e -strict.perms=false
+    depends_on:
+      - elasticsearch
+    networks:
+      - plataform-network
+    restart: unless-stopped
+
+  metricbeat:
+    image: docker.elastic.co/beats/metricbeat:8.11.0
+    container_name: metricbeat
+    user: root
+    volumes:
+      - ./metricbeat.yml:/usr/share/metricbeat/metricbeat.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command: metricbeat -e -strict.perms=false
+    depends_on:
+      - elasticsearch
+    networks:
+      - plataform-network
+    restart: unless-stopped
+
 volumes:
   postgres_data:
   atlas_data:
   atlas_logs:
   iceberg_warehouse:
+  elasticsearch_data:
 
 networks:
   plataform-network:

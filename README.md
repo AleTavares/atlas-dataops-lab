@@ -25,6 +25,9 @@ Este repositório fornece um ambiente completo de aprendizado para **Data Govern
 | **Orquestração** | Apache Airflow | 3.0.0 | 5000 | Workflows e ETL |
 | **Analytics** | PySpark + Jupyter | Latest | 8888 | Análise e notebooks |
 | **Data Lake** | Apache Iceberg | 1.4.3 | - | Armazenamento com versionamento |
+| **Monitoring** | Elasticsearch | 8.11.0 | 9200 | Armazenamento de logs |
+| **Visualization** | Kibana | 8.11.0 | 5601 | Dashboards e análise |
+| **Log Shipping** | Filebeat | 8.11.0 | - | Coleta de logs |
 | **Storage** | HBase (embedded) | - | - | Persistência Atlas |
 | **Search** | Apache Solr (embedded) | - | - | Indexação e busca |
 | **Messaging** | Apache Kafka (embedded) | - | - | Eventos e notificações |
@@ -124,6 +127,8 @@ docker-compose ps
 |---------|-----|-------------|
 | **Apache Atlas** | http://localhost:21000 | admin / admin |
 | **Apache Airflow** | http://localhost:5000 | admin / admin |
+| **Kibana** | http://localhost:5601 | - |
+| **Elasticsearch** | http://localhost:9200 | - |
 | **Jupyter Notebook** | http://localhost:8888 | Token: tavares1234 |
 | **PostgreSQL** | localhost:2001 | postgres / postgres |
 
@@ -360,7 +365,7 @@ Os próximos desenvolvimentos deste repositório incluirão a implementação de
 | **PostgreSQL** | Extração de metadados Northwind | ✅ **Implementado** |
 | **Spark** | Jobs ETL com Iceberg | ✅ **Implementado** |
 | **Iceberg** | Armazenamento com versionamento | ✅ **Implementado** |
-| **Monitoring** | Dashboard de qualidade de dados | 📋 Planejado |
+| **Monitoring** | Elastic Stack (Logs e Métricas) | ✅ **Implementado** |
 | **Governance** | Políticas avançadas | 📋 Planejado |
 
 ### **Benefícios da Evolução**
